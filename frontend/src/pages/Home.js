@@ -1,17 +1,45 @@
 import React, { useEffect, useState } from 'react';
+import EditModal from '../components/modals/EditModal';
 import { Layout } from '../layout';
 import axios from 'axios';
 
-// const axios = require('axios');
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import TextField from '@mui/material/TextField';
+import Checkbox from '@mui/material/Checkbox';
 
 const Home = () => {
 
     const [items, setItems] = useState([])
     const [body, setBody] = useState('')
+    const [ui, setUi] = useState({
+        open: false,
+        item: null
+    })
 
     useEffect(() => {
         handleFetch()
     }, [])
+
+
+    const handleChangeCheckBox = async (item) => {
+        try {
+            const resp = await axios.put(
+                `http://127.0.0.1:8000/api/todo/${item.id}/`, {
+                is_complete: !item.is_complete,
+            })
+            handleUpdate(resp.data)
+        }
+        catch (error) {
+            console.log("error")
+        }
+    };
 
     const handleFetch = async () => {
         try {
@@ -30,8 +58,7 @@ const Home = () => {
     const handleDelete = async (id) => {
         try {
             const resp = await axios.delete(`http://127.0.0.1:8000/api/todo/${id}/`)
-            console.log("response: ", resp.data)
-            // setItems(resp.data)
+
             const result = items.filter(item => item.id !== id);
             setItems(result)
         }
@@ -47,8 +74,6 @@ const Home = () => {
                 'http://127.0.0.1:8000/api/todo/', {
                 body: body,
             })
-
-            console.log("response: ", resp)
             setItems([...items, resp.data])
             setBody('')
 
@@ -58,42 +83,79 @@ const Home = () => {
         }
     }
 
-    const handleUpdate = async (e) => {
-        e.preventDefault()
-        try {
-            const resp = await axios.put(
-                'http://127.0.0.1:8000/api/todo/3/', {
-                body: 'updated nuevamente new new ',
+    const handleUpdate = (element) => {
+        const newArr = items.map(item => {
+            if (item.id === element.id) return element
 
-            })
-            const newArr = items.map(item => {
-                if (item.id === resp.data.id) return resp.data
+            return item
+        })
 
-                return item
-            })
-            setItems(newArr)
-
-        }
-        catch (error) {
-            console.log("error")
-        }
+        setItems(newArr)
     }
 
+    const handleClose = () => setUi({ ...ui, open: false, item: null })
 
     return (
         <Layout>
-            <h1>This is the Homepage</h1>
-            <form >
-                <p>body</p>
-                <input type="text" value={body} onChange={handleValue} />
-                <button type='submit' onClick={(e) => handleSubmit(e)}>Submit</button>
-                <button type='submit' onClick={(e) => handleUpdate(e)}>Update</button>
-            </form>
+            <Grid
+                marginBottom="20px"
+                container
+                justifyContent="center"
+                spacing={2}
+            >
+                <Grid item xs={6} style={{ textAlign: 'center' }}>
+                    <Card >
+                        <CardContent >
+                            <Typography id="modal-modal-title" variant="h6" component="h2" >
+                                Add To-Do
+                            </Typography>
+                            <form >
+                                <TextField fullWidth label="Add To-Do" value={body} id="fullWidth" onChange={handleValue} />
+                                <Button variant="contained" onClick={(e) => handleSubmit(e)} >Add</Button>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </Grid >
+            </Grid >
 
-            {items.map((item) => (<div key={item.id}>
-                {item.body}<button type="button" onClick={() => handleDelete(item.id)}>DELETE</button>
-            </div>))
+            {
+                items.map((item) => (<div key={item.id}>
+                    <Grid
+                        marginBottom="10px"
+                        container
+                        justifyContent="space-evenly"
+                        alignItems="center"
+                    >
+                        <Grid item xs={6} >
+                            <Card >
+                                <CardContent style={{ flexDirection: "row", display: "flex", alignItems: "center" }}>
+
+                                    <Checkbox
+                                        checked={item.is_complete}
+                                        onChange={() => handleChangeCheckBox(item)}
+                                        inputProps={{ 'aria-label': 'controlled' }}
+                                    />
+                                    <div style={{ flexGrow: 1 }}>
+                                        <Typography variant="h5" component="div" style={{ textDecoration: item.is_complete ? 'line-through' : "none" }}>
+                                            {item.body}
+                                        </Typography>
+                                    </div>
+                                    <div>
+                                        <IconButton aria-label="delete" color="primary" onClick={() => setUi({ ...ui, open: true, item: item })} >
+                                            <EditIcon fontSize="inherit" />
+                                        </IconButton>
+                                        <IconButton aria-label="delete" color="error" onClick={() => handleDelete(item.id)}>
+                                            <DeleteIcon fontSize="inherit" />
+                                        </IconButton>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Grid >
+                    </Grid>
+                </div>)).reverse()
             }
+
+            {ui.open && <EditModal open={ui.open} item={ui.item} onClose={handleClose} onUpdate={handleUpdate} />}
         </Layout >
     )
 };
