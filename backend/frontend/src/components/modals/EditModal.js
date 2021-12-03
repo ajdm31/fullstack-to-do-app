@@ -66,11 +66,9 @@ const EditModal = ({ open, item, onClose, onUpdate }) => {
                     <Typography id="modal-modal-title" variant="h6" component="h2">
                         Edit Element
                     </Typography>
-                    <form>
-                        <TextField style={{ padding: '25px' }} fullWidth value={body} id="fullWidth" onChange={(e) => setBody(e.target.value)} />
-                        <Button variant="contained" onClick={() => handleSubmit()} >Save</Button>
-                        <Button variant="contained" color="error" onClick={() => onClose()} >Cancel</Button>
-                    </form>
+                    <TextField style={{ padding: '25px' }} fullWidth value={body} id="fullWidth" onChange={(e) => setBody(e.target.value)} />
+                    <Button variant="contained" onClick={() => handleSubmit()} >Save</Button>
+                    <Button variant="contained" color="error" onClick={() => onClose()} >Cancel</Button>
                 </Box>
             </Modal>
         </div>

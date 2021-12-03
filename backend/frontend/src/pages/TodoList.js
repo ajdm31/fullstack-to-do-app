@@ -118,10 +118,10 @@ const TodoList = () => {
                             <Typography id="modal-modal-title" variant="h6" component="h2" >
                                 Add To-Do
                             </Typography>
-                            <form >
-                                <TextField fullWidth label="Task Name" value={body} id="fullWidth" onChange={handleValue} />
-                                <Button variant="contained" onClick={(e) => handleSubmit(e)} >Add</Button>
-                            </form>
+
+                            <TextField fullWidth label="Task Name" value={body} id="fullWidth" onChange={handleValue} />
+                            <Button variant="contained" onClick={(e) => handleSubmit(e)} >Add</Button>
+
                         </CardContent>
                     </Card>
                 </Grid >

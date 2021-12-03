@@ -103,10 +103,10 @@ const Home = () => {
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 Add Folder
                             </Typography>
-                            <form>
-                                <TextField fullWidth label="Folder Name" value={nameFolder} id="fulWidth" onChange={handleValue} />
-                                <Button variant="contained" onClick={(e) => handleSubmit(e)}>Create</Button>
-                            </form>
+
+                            <TextField fullWidth label="Folder Name" value={nameFolder} id="fulWidth" onChange={handleValue} />
+                            <Button variant="contained" onClick={(e) => handleSubmit(e)}>Create</Button>
+
                         </CardContent>
                     </Card>
                 </Grid>
