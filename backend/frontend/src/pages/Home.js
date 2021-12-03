@@ -12,8 +12,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import Button from '@mui/material/Button';
+import FolderIcon from '@mui/icons-material/Folder';
 import { TextField } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { yellow } from '@mui/material/colors';
 
 
 const Home = () => {
@@ -121,7 +123,8 @@ const Home = () => {
                         <Grid item xs={6} >
                             <Card >
                                 <CardContent style={{ flexDirection: "row", display: "flex", alignItems: "center" }}>
-                                    <Link to={`/folder/${folder.id}`} style={{ flexGrow: 1, textDecoration: 'none', color: "black" }}>
+                                    <Link to={`/folder/${folder.id}`} style={{ flexGrow: 1, flexDirection: "row", display: 'flex', textDecoration: 'none', color: "black" }}>
+                                        <FolderIcon fontSize="large" sx={{ color: yellow[500] }} />
                                         <Typography variant="h5" component="div" style={{ flexGrow: 1 }} >
                                             {folder.name}
                                         </Typography>
