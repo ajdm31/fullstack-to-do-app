@@ -3,64 +3,39 @@ import EditModal from '../components/modals/EditModal';
 import { Layout } from '../layout';
 import axios from 'axios';
 
+import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
+
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
-import TextField from '@mui/material/TextField';
-import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import { TextField } from '@mui/material';
+import { Link } from 'react-router-dom';
+
 
 const Home = () => {
-
-    const [items, setItems] = useState([])
-    const [body, setBody] = useState('')
+    const [folders, setFolders] = useState([]);
+    const [nameFolder, setNameFolder] = useState('');
     const [ui, setUi] = useState({
         open: false,
         item: null
-    })
+    });
 
     useEffect(() => {
         handleFetch()
     }, [])
 
-
-    const handleChangeCheckBox = async (item) => {
-        try {
-            const resp = await axios.put(
-                `http://127.0.0.1:8000/api/todo/${item.id}/`, {
-                is_complete: !item.is_complete,
-            })
-            handleUpdate(resp.data)
-        }
-        catch (error) {
-            console.log("error")
-        }
-    };
+    const handleValue = (e) => {
+        setNameFolder(e.target.value)
+    }
 
     const handleFetch = async () => {
         try {
-            const resp = await axios.get('http://127.0.0.1:8000/api/todo/')
-            setItems(resp.data)
-        }
-        catch (error) {
-            console.log("error")
-        }
-    }
-
-    const handleValue = (e) => {
-        setBody(e.target.value)
-    }
-
-    const handleDelete = async (id) => {
-        try {
-            const resp = await axios.delete(`http://127.0.0.1:8000/api/todo/${id}/`)
-
-            const result = items.filter(item => item.id !== id);
-            setItems(result)
+            const resp = await axios.get('http://127.0.0.1:8000/api/folder/')
+            setFolders(resp.data)
         }
         catch (error) {
             console.log("error")
@@ -69,13 +44,14 @@ const Home = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (nameFolder === '') return
         try {
             const resp = await axios.post(
-                'http://127.0.0.1:8000/api/todo/', {
-                body: body,
+                'http://127.0.0.1:8000/api/folder/', {
+                name: nameFolder,
             })
-            setItems([...items, resp.data])
-            setBody('')
+            setFolders([...folders, resp.data])
+            setNameFolder('')
 
         }
         catch (error) {
@@ -83,43 +59,59 @@ const Home = () => {
         }
     }
 
+    const handleDelete = async (id) => {
+
+        try {
+            await axios.delete(`http://127.0.0.1:8000/api/folder/${id}/`)
+
+            const result = folders.filter(folder => folder.id !== id);
+            setFolders(result)
+        }
+        catch (error) {
+            console.log("error")
+        }
+    }
+
     const handleUpdate = (element) => {
-        const newArr = items.map(item => {
-            if (item.id === element.id) return element
+        const newArr = folders.map(folder => {
+            if (folder.id === element.id) return element
 
-            return item
+            return folder
         })
-
-        setItems(newArr)
+        setFolders(newArr)
     }
 
     const handleClose = () => setUi({ ...ui, open: false, item: null })
 
+
+
     return (
         <Layout>
             <Grid
+                marginTop="10px"
                 marginBottom="20px"
                 container
                 justifyContent="center"
                 spacing={2}
+
             >
                 <Grid item xs={6} style={{ textAlign: 'center' }}>
-                    <Card >
-                        <CardContent >
-                            <Typography id="modal-modal-title" variant="h6" component="h2" >
-                                Add To-Do
+                    <Card>
+                        <CardContent>
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                Add Folder
                             </Typography>
-                            <form >
-                                <TextField fullWidth label="Add To-Do" value={body} id="fullWidth" onChange={handleValue} />
-                                <Button variant="contained" onClick={(e) => handleSubmit(e)} >Add</Button>
+                            <form>
+                                <TextField fullWidth label="Folder Name" value={nameFolder} id="fulWidth" onChange={handleValue} />
+                                <Button variant="contained" onClick={(e) => handleSubmit(e)}>Create</Button>
                             </form>
                         </CardContent>
                     </Card>
-                </Grid >
-            </Grid >
+                </Grid>
+            </Grid>
 
             {
-                items.map((item) => (<div key={item.id}>
+                folders.map((folder) => (<div key={folder.id}>
                     <Grid
                         marginBottom="10px"
                         container
@@ -129,34 +121,30 @@ const Home = () => {
                         <Grid item xs={6} >
                             <Card >
                                 <CardContent style={{ flexDirection: "row", display: "flex", alignItems: "center" }}>
-
-                                    <Checkbox
-                                        checked={item.is_complete}
-                                        onChange={() => handleChangeCheckBox(item)}
-                                        inputProps={{ 'aria-label': 'controlled' }}
-                                    />
-                                    <div style={{ flexGrow: 1 }}>
-                                        <Typography variant="h5" component="div" style={{ textDecoration: item.is_complete ? 'line-through' : "none" }}>
-                                            {item.body}
+                                    <Link to={`/folder/${folder.id}`} style={{ flexGrow: 1, textDecoration: 'none', color: "black" }}>
+                                        <Typography variant="h5" component="div" style={{ flexGrow: 1 }} >
+                                            {folder.name}
                                         </Typography>
-                                    </div>
+                                    </Link>
+
                                     <div>
-                                        <IconButton aria-label="delete" color="primary" onClick={() => setUi({ ...ui, open: true, item: item })} >
+                                        <IconButton aria-label="edit" color="primary" onClick={() => setUi({ ...ui, open: true, item: folder })} >
                                             <EditIcon fontSize="inherit" />
                                         </IconButton>
-                                        <IconButton aria-label="delete" color="error" onClick={() => handleDelete(item.id)}>
+                                        <IconButton aria-label="delete" color="error" onClick={() => handleDelete(folder.id)}>
                                             <DeleteIcon fontSize="inherit" />
                                         </IconButton>
                                     </div>
                                 </CardContent>
+
                             </Card>
                         </Grid >
                     </Grid>
                 </div>)).reverse()
             }
 
-            {ui.open && <EditModal open={ui.open} item={ui.item} onClose={handleClose} onUpdate={handleUpdate} />}
-        </Layout >
+            {ui.open && <EditModal open={ui.open} item={ui.item} onClose={handleClose} onUpdate={handleUpdate} folder={true} />}
+        </Layout>
     )
 };
 

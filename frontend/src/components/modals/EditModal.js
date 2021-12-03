@@ -20,26 +20,40 @@ const style = {
 };
 
 const EditModal = ({ open, item, onClose, onUpdate }) => {
+    const [body, setBody] = useState(item ? item.body || item.name : '')
 
-    const [body, setBody] = useState(item ? item.body : '')
+    const handleFetch = async (method, url, data) => {
+        const res = await axios({
+            method: method,
+            url: url,
+            data: (data ? data : undefined),
+        })
+
+        return res.data
+    }
+
 
     const handleSubmit = async (e) => {
+        let path = ''
+        let data = {}
 
-        let id = item.id
-        try {
-            const resp = await axios.put(
-                `http://127.0.0.1:8000/api/todo/${id}/`, {
-                body: body,
+        if (item.body) {
+            path = 'todo'
+            data.body = body
+        }
 
-            })
-            onUpdate(resp.data)
-            onClose()
+        if (item.name) {
+            path = 'folder'
+            data.name = body
 
         }
-        catch (error) {
-            console.log("error")
-        }
+        const url = `http://127.0.0.1:8000/api/${path}/${item.id}/`
+        const resp = await handleFetch('PUT', url, data)
+
+        onUpdate(resp)
+        onClose()
     }
+
     return (
         <div>
             <Modal

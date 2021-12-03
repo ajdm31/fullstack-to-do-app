@@ -12,9 +12,10 @@ import { Nav } from './layout'
 function App() {
   return (
     <Router>
-
+      <Nav />
       <Routes>
         <Route exact path="/" element={<Home />} />
+        <Route path="/folder/:id" element={<TodoList />} />
 
         <Route path="/list" element={<TodoList />} />
       </Routes>
